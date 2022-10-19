@@ -1,0 +1,13 @@
+.my_wrap {
+  display: none;
+}
+
+#wind_read_content_id img {
+  min-width: 100px;
+  min-height: 100px;
+  max-width: calc(100% - 10px);
+  max-height: 80vh;
+  margin: 4px 6px 6px 4px;
+  box-shadow: 1px 1px 5px #808080;
+  border-radius: 6px;
+}
