@@ -1,0 +1,38 @@
+[
+  {
+    "name": "1024/列表",
+    "description": "",
+    "icon": "https://caoliu1024.com/favicon.ico",
+    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/1024/list.css",
+    "matches": [
+      {
+        "type": "wildcard",
+        "value": "https://caoliu1024.com/thread.php*"
+      }
+    ]
+  },
+  {
+    "name": "1024/阅读",
+    "description": "",
+    "icon": "https://caoliu1024.com/favicon.ico",
+    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/1024/read.css",
+    "matches": [
+      {
+        "type": "wildcard",
+        "value": "https://caoliu1024.com/read.php*"
+      }
+    ]
+  },
+  {
+    "name": "小说",
+    "description": "",
+    "icon": "",
+    "url": "http://192.168.3.100:8080/scripts/novel.js",
+    "matches": [
+      {
+        "type": "selector",
+        "value": ""
+      }
+    ]
+  }
+]

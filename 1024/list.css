@@ -1,3 +1,5 @@
 h3 a:visited {
-  color: #999999 !important;
+  /* color: #999999 !important; */
+  opacity: 0.5;
+  filter: grayscale(0.8);
 }
