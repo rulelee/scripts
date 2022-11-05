@@ -19,7 +19,6 @@ function saveAs(target, fileName) {
   /^blob:/.test(link.href) && URL.revokeObjectURL(link.href);
 }
 
-
 document.addEventListener("downloadNovel", (e) => {
 
   // 选择器
