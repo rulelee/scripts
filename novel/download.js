@@ -1,5 +1,4 @@
-
-async function downloadNovel() {
+window.downloadNovel = async function () {
 
   const selectors = {
     name: ".info>.h2",
