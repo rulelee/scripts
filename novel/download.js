@@ -1,4 +1,4 @@
-window.downloadNovel = async function () {
+document.addEventListener("downloadNovel", () => {
 
   const selectors = {
     name: ".info>.h2",
@@ -33,4 +33,4 @@ window.downloadNovel = async function () {
 
   console.log(">>>>>>>>>>>>>>>>>>>>> 小说下载", chapters);
 
-}
+});
