@@ -1,4 +1,5 @@
-window.addEventListener("load", async () => {
+
+async function downloadNovel() {
 
   const selectors = {
     name: ".info>.h2",
@@ -33,4 +34,4 @@ window.addEventListener("load", async () => {
 
   console.log(">>>>>>>>>>>>>>>>>>>>> 小说下载", chapters);
 
-});
+}
