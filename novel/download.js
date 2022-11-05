@@ -63,10 +63,10 @@ document.addEventListener("downloadNovel", async (e) => {
       if (selectors.excludeContent) {
         for (const elm of contentElm.querySelectorAll(selectors.excludeContent)) elm.remove?.();
       }
-      return contentElm.innerText.trim().split(/[\s\n]{2,}/).join(`\n\n  `);
+      return [chapter.title].concat(contentElm.innerText.trim().split(/[\s\n]{2,}/)).join(`\n\n  `);
     }
     return "章节内容为空";
-  }).join("\n\n");
+  }).join("\n\n\n\n");
 
   // 保存小说
   saveAs(new Blob([novelContent], { type: `text/plain` }), name);
