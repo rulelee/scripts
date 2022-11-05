@@ -35,6 +35,7 @@ document.addEventListener("downloadNovel", async (e) => {
 
   // 加载下一章
   await (async function loadNext(index = 0) {
+    const progress = `[${index + 1}/${chapters.length}]`;
     try {
       const chapter = chapters[index];
       if (chapter) {
@@ -45,11 +46,12 @@ document.addEventListener("downloadNovel", async (e) => {
           reader.readAsText(blob, document.characterSet);
         });
       }
-      console.log(`[${index + 1}/${chapters.length}}]`);
+      console.log(progress);
       // 继续下一章
       const nextIndex = index + 1;
       nextIndex in chapters && await loadNext(nextIndex);
     } catch (error) {
+      console.error(progress, "下载失败...");
       await loadNext(index);
     }
   })();
