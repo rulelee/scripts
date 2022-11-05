@@ -17,7 +17,7 @@ function saveAs(target, fileName) {
   /^blob:/.test(link.href) && URL.revokeObjectURL(link.href);
 }
 
-document.addEventListener("downloadNovel", (e) => {
+document.addEventListener("downloadNovel", async (e) => {
 
   // 选择器
   const selectors = Object(e.detail);
@@ -34,7 +34,7 @@ document.addEventListener("downloadNovel", (e) => {
   });
 
   // 加载下一章
-  async function loadNext(index = 0) {
+  await (async function loadNext(index = 0) {
     try {
       const chapter = chapters[index];
       if (chapter) {
@@ -47,9 +47,7 @@ document.addEventListener("downloadNovel", (e) => {
     } catch (error) {
       loadNext(index);
     }
-  }
-
-  loadNext();
+  })();
 
   // 小说内容
   const novelContent = chapters.map((chapter) => {
