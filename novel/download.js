@@ -35,15 +35,18 @@ document.addEventListener("downloadNovel", (e) => {
 
   // 加载下一章
   async function loadNext(index = 0) {
-    const chapter = chapters[index];
-
-    if (chapter) {
-      chapter.raw = await fetch(chapter.url).then(r => r.text());
+    try {
+      const chapter = chapters[index];
+      if (chapter) {
+        chapter.raw = await fetch(chapter.url).then(r => r.text());
+      }
+      console.log(`[${index + 1}/${chapters.length}}]`);
+      // 继续下一章
+      const nextIndex = index + 1;
+      nextIndex in chapters && loadNext(nextIndex);
+    } catch (error) {
+      loadNext(index);
     }
-
-    // 继续下一章
-    const nextIndex = index + 1;
-    nextIndex in chapters && loadNext(nextIndex);
   }
 
   loadNext();
@@ -51,8 +54,15 @@ document.addEventListener("downloadNovel", (e) => {
   // 小说内容
   const novelContent = chapters.map((chapter) => {
     const dom = new DOMParser().parseFromString(chapter.raw, "text/html");
-    const content = dom.querySelector(selectors.content)?.innerText.trim() || "";
-    return content.split(/[\s\n]{2,}/).join(`\n\n  `);
+    const contentElm = dom.querySelector(selectors.content);
+    if (contentElm) {
+      // 清除内容被排除的元素
+      if (selectors.excludeContent) {
+        for (const elm of contentElm.querySelectorAll(selectors.excludeContent)) elm.remove?.();
+      }
+      return contentElm.innerText.trim().split(/[\s\n]{2,}/).join(`\n\n  `);
+    }
+    return "章节内容为空";
   }).join("\n\n");
 
   // 保存小说
