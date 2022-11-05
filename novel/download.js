@@ -38,11 +38,12 @@ document.addEventListener("downloadNovel", async (e) => {
     try {
       const chapter = chapters[index];
       if (chapter) {
-        chapter.raw = await fetch(chapter.url, {
-          headers: {
-            "Content-Type": `text/html; charset=${document.characterSet}`
-          }
-        }).then(r => r.text());
+        const blob = await fetch(chapter.url).then(r => r.blob());
+        chapter.raw = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.addEventListener("load", (e) => resolve(e.target.result));
+          reader.readAsText(blob, document.characterSet);
+        });
       }
       console.log(`[${index + 1}/${chapters.length}}]`);
       // 继续下一章
