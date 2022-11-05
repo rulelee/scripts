@@ -38,7 +38,11 @@ document.addEventListener("downloadNovel", async (e) => {
     try {
       const chapter = chapters[index];
       if (chapter) {
-        chapter.raw = await fetch(chapter.url).then(r => r.text());
+        chapter.raw = await fetch(chapter.url, {
+          headers: {
+            "Content-Type": `text/html; charset=${document.characterSet}`
+          }
+        }).then(r => r.text());
       }
       console.log(`[${index + 1}/${chapters.length}}]`);
       // 继续下一章
@@ -64,6 +68,6 @@ document.addEventListener("downloadNovel", async (e) => {
   }).join("\n\n");
 
   // 保存小说
-  saveAs(new Blob([novelContent], { type: "text/plain" }), name);
+  saveAs(new Blob([novelContent], { type: `text/plain; charset=${document.characterSet}` }), name);
 
 });
