@@ -43,9 +43,9 @@ document.addEventListener("downloadNovel", async (e) => {
       console.log(`[${index + 1}/${chapters.length}}]`);
       // 继续下一章
       const nextIndex = index + 1;
-      nextIndex in chapters && loadNext(nextIndex);
+      nextIndex in chapters && await loadNext(nextIndex);
     } catch (error) {
-      loadNext(index);
+      await loadNext(index);
     }
   })();
 
