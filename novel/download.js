@@ -69,6 +69,6 @@ document.addEventListener("downloadNovel", async (e) => {
   }).join("\n\n");
 
   // 保存小说
-  saveAs(new Blob([novelContent], { type: `text/plain; charset=${document.characterSet}` }), name);
+  saveAs(new Blob([novelContent], { type: `text/plain` }), name);
 
 });
