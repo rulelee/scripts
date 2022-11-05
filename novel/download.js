@@ -1,5 +1,3 @@
-
-
 /**
  * 另存为
  * ---
@@ -52,7 +50,7 @@ document.addEventListener("downloadNovel", (e) => {
 
   // 小说内容
   const novelContent = chapters.map((chapter) => {
-    const dom = new DOMParser().parseFromString(chapter.raw);
+    const dom = new DOMParser().parseFromString(chapter.raw, "text/html");
     const content = dom.querySelector(selectors.content)?.innerText.trim() || "";
     return content.split(/[\s\n]{2,}/).join(`\n\n  `);
   }).join("\n\n");
