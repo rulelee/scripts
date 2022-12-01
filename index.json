@@ -25,7 +25,7 @@
   },
   {
     "name": "小说",
-    "description": "",
+    "description": "下载",
     "icon": "",
     "url": "https://raw.githubusercontent.com/rulelee/scripts/main/novel/download.js",
     "matches": [
