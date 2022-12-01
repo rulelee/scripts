@@ -27,7 +27,7 @@
     "name": "小说",
     "description": "",
     "icon": "",
-    "url": "http://192.168.3.100:8080/scripts/novel.js",
+    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/novel/download.js",
     "matches": [
       {
         "type": "selector",
