@@ -4,7 +4,7 @@
  * @param {string | Blob | File | MediaSource} target 目标对象
  * @param {string} fileName 文件名
  */
- function saveAs(target, fileName) {
+function saveAs(target, fileName) {
   // 创建链接元素
   const link = document.createElement("a");
   // 设置文件名称
@@ -33,7 +33,7 @@ document.addEventListener("downloadNovel", async (e) => {
   // 小说名称
   novel.name = document.querySelector(selectors.name)?.innerText || "未命名";
 
-  const chapterElms = await (() => {
+  const chapterElms = await (async () => {
     const sections = [...document.querySelectorAll(selectors.chapterSections)];
     if (!sections.length) {
       return [...document.querySelectorAll(selectors.chapters)];
@@ -47,13 +47,15 @@ document.addEventListener("downloadNovel", async (e) => {
   })();
 
   // 章节列表
-  novel.chapters = chapterElms.map(elm => {
+  novel.chapters = chapterElms.flat().map(elm => {
     return {
       title: elm.text,
       url: elm.href,
       raw: "",
     }
   });
+
+  console.log(">>>", novel.chapters);
 
   // 加载下一章
   await (async function loadNext(index = 0) {
