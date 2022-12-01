@@ -4,7 +4,7 @@
  * @param {string | Blob | File | MediaSource} target 目标对象
  * @param {string} fileName 文件名
  */
-function saveAs(target, fileName) {
+ function saveAs(target, fileName) {
   // 创建链接元素
   const link = document.createElement("a");
   // 设置文件名称
@@ -17,27 +17,49 @@ function saveAs(target, fileName) {
   /^blob:/.test(link.href) && URL.revokeObjectURL(link.href);
 }
 
+/**
+ * 注册事件
+ */
 document.addEventListener("downloadNovel", async (e) => {
 
   // 选择器
   const selectors = Object(e.detail);
 
+  const novel = {
+    name: "",
+    chapters: [],
+  }
+
   // 小说名称
-  const name = document.querySelector(selectors.name)?.innerText || "未命名";
+  novel.name = document.querySelector(selectors.name)?.innerText || "未命名";
+
+  const chapterElms = await (() => {
+    const sections = [...document.querySelectorAll(selectors.chapterSections)];
+    if (!sections.length) {
+      return [...document.querySelectorAll(selectors.chapters)];
+    }
+    return Promise.all(sections.map((elm) => {
+      return fetch(elm.value).then(r => r.text()).then(text => {
+        const dom = new DOMParser().parseFromString(text, "text/html");
+        return [...dom.querySelectorAll(selectors.chapters)];
+      });
+    }));
+  })();
 
   // 章节列表
-  const chapters = [...document.querySelectorAll(selectors.chapters)].map(elm => {
+  novel.chapters = chapterElms.map(elm => {
     return {
       title: elm.text,
       url: elm.href,
+      raw: "",
     }
   });
 
   // 加载下一章
   await (async function loadNext(index = 0) {
-    const progress = `[${index + 1}/${chapters.length}]`;
+    const progress = `[${index + 1}/${novel.chapters.length}]`;
     try {
-      const chapter = chapters[index];
+      const chapter = novel.chapters[index];
       if (chapter) {
         const blob = await fetch(chapter.url).then(r => r.blob());
         chapter.raw = await new Promise((resolve) => {
@@ -49,7 +71,7 @@ document.addEventListener("downloadNovel", async (e) => {
       console.log(progress);
       // 继续下一章
       const nextIndex = index + 1;
-      nextIndex in chapters && await loadNext(nextIndex);
+      nextIndex in novel.chapters && await loadNext(nextIndex);
     } catch (error) {
       console.error(progress, "下载失败...");
       await loadNext(index);
@@ -57,7 +79,7 @@ document.addEventListener("downloadNovel", async (e) => {
   })();
 
   // 小说内容
-  const novelContent = chapters.map((chapter) => {
+  const novelContent = novel.chapters.map((chapter) => {
     const dom = new DOMParser().parseFromString(chapter.raw, "text/html");
     const contentElm = dom.querySelector(selectors.content);
     if (contentElm) {
@@ -71,6 +93,18 @@ document.addEventListener("downloadNovel", async (e) => {
   }).join("\n\n\n\n");
 
   // 保存小说
-  saveAs(new Blob([novelContent], { type: `text/plain` }), name);
+  saveAs(new Blob([novelContent], { type: `text/plain` }), novel.name);
 
 });
+
+// (() => {
+//   document.dispatchEvent(new CustomEvent("downloadNovel", {
+//     detail: {
+//       name: "#info>h1",
+//       chapters: "#list a",
+//       content: "#content",
+//       excludeContent: "div,script,a"
+//     }
+//   }))
+// }
+// )();
