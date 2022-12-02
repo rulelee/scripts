@@ -30,8 +30,20 @@
     "url": "https://raw.githubusercontent.com/rulelee/scripts/main/novel/download.js",
     "matches": [
       {
-        "type": "selector",
-        "value": ""
+        "type": "wildcard",
+        "value": "*"
+      }
+    ]
+  },
+  {
+    "name": "MFCOS",
+    "description": "",
+    "icon": "",
+    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/mfcos/video.css",
+    "matches": [
+      {
+        "type": "wildcard",
+        "value": "https://www.mfcos*.xyz/*.html"
       }
     ]
   }
