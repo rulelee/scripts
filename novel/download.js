@@ -25,6 +25,7 @@ document.addEventListener("downloadNovel", async (e) => {
   // 选择器
   const selectors = Object(e.detail);
 
+  // 小说
   const novel = {
     name: "",
     chapters: [],
@@ -33,7 +34,8 @@ document.addEventListener("downloadNovel", async (e) => {
   // 小说名称
   novel.name = document.querySelector(selectors.name)?.innerText || "未命名";
 
-  const chapterElms = await (async () => {
+  // 章节元素
+  const chapterElms = await (() => {
     const sections = [...document.querySelectorAll(selectors.chapterSections)];
     if (!sections.length) {
       return [...document.querySelectorAll(selectors.chapters)];
