@@ -50,9 +50,10 @@ async function getChapters(chapterSelector, pagingSelector) {
   let chapterElms = [];
 
   if (pagingSelector) {
-    chapterElms = (await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
+    const sections = await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
       return getDOM(elm.value).then((dom) => [...dom.querySelectorAll(chapterSelector)]);
-    }))).flat();
+    }));
+    chapterElms = sections.flat();
   } else {
     chapterElms = [...document.querySelectorAll(selectors.chapters)];
   }
