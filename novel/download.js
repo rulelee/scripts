@@ -58,7 +58,7 @@ async function getChapters(chapterSelector, pagingSelector) {
     chapterElms = [...document.querySelectorAll(selectors.chapters)];
   }
 
-  chapterElms.map(elm => {
+  return chapterElms.map(elm => {
     return {
       title: elm.text,
       url: elm.href
