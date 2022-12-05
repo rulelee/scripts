@@ -39,23 +39,23 @@ function getDOM(url) {
 /**
  * 获取章节列表
  * ---
- * @param {string} chapterSelector 章节选择器
+ * @param {string} chaptersSelector 章节选择器
  * @param {string} pagingSelector 分页选择器
  * @returns {Array<{
  *  title: string, // 章节标题
  *  url: string,   // 章节网址
  * }>} 通过Promise返回章节列表
  */
-async function getChapters(chapterSelector, pagingSelector) {
+async function getChapters(chaptersSelector, pagingSelector) {
   let chapterElms = [];
 
   if (pagingSelector) {
     const sections = await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
-      return getDOM(elm.value).then((dom) => [...dom.querySelectorAll(chapterSelector)]);
+      return getDOM(elm.value).then((dom) => [...dom.querySelectorAll(chaptersSelector)]);
     }));
     chapterElms = sections.flat();
   } else {
-    chapterElms = [...document.querySelectorAll(selectors.chapters)];
+    chapterElms = [...document.querySelectorAll(chaptersSelector)];
   }
 
   return chapterElms.map(elm => {
@@ -123,7 +123,7 @@ document.addEventListener("downloadNovel", async (e) => {
       } else {
         novel.chapters.push("章节内容为空");
       }
-      console.log(`[${chapter.title}]`);
+      console.log(chapter.title);
       // 继续下一章
       chapter.nextUrl !== location.href && await loadNext(chapter.nextUrl);
     } catch (error) {
