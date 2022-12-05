@@ -125,7 +125,9 @@ document.addEventListener("downloadNovel", async (e) => {
       }
       console.log(chapter.title);
       // 继续下一章
-      chapter.nextUrl !== location.href && await loadNext(chapter.nextUrl);
+      if (chapter.nextUrl && new URL(chapter.nextUrl).hostname && chapter.nextUrl !== location.href) {
+        await loadNext(chapter.nextUrl);
+      }
     } catch (error) {
       console.error("下载失败...");
       await loadNext(url);
