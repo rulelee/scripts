@@ -18,7 +18,76 @@ function saveAs(target, fileName) {
 }
 
 /**
- * 注册事件
+ * 获取DOM对象
+ * ---
+ * @param {string} url 页面网址
+ * @returns {Promise<Document | Element>} 通过Promise返回DOM对象
+ */
+function getDOM(url) {
+  return new Promise((resolve, reject) => {
+    fetch(url).then(r => r.blob()).then((blob) => {
+      const reader = new FileReader();
+      reader.addEventListener("load", (e) => {
+        resolve(new DOMParser().parseFromString(e.target.result, "text/html"));
+      });
+      reader.addEventListener("error", reject);
+      reader.readAsText(blob, document.characterSet);
+    }).catch(reject);
+  });
+}
+
+/**
+ * 获取章节列表
+ * ---
+ * @param {string} chapterSelector 章节选择器
+ * @param {string} pagingSelector 分页选择器
+ * @returns {Array<{
+ *  title: string, // 章节标题
+ *  url: string,   // 章节网址
+ * }>} 通过Promise返回章节列表
+ */
+async function getChapters(chapterSelector, pagingSelector) {
+  return (
+    pagingSelector
+      ? (await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
+        return getDOM(elm.value).then((dom) => dom.querySelectorAll(chapterSelector));
+      }))).flat()
+      : [...document.querySelectorAll(selectors.chapters)]
+  ).map(elm => {
+    return {
+      title: elm.text,
+      url: elm.href
+    }
+  });
+}
+
+/**
+ * 获取章节
+ * ---
+ * @param {string} url 章节网址
+ * @param {string} titleSelector 标题选择器
+ * @param {string} contentSelector 内容选择器
+ * @param {string} nextSelector 下一页选择器
+ * @returns {{
+ *  title: string,           // 章节标题
+ *  nextUrl: string,         // 下一页网址
+ *  contentElement: Element, // 内容元素
+ * }}
+ */
+function getChapter(url, titleSelector, contentSelector, nextSelector) {
+  return getDOM(url).then((dom) => {
+    return {
+      url,
+      title: dom.querySelector(titleSelector)?.innerText,
+      nextUrl: dom.querySelector(nextSelector)?.href,
+      contentElement: dom.querySelector(contentSelector),
+    };
+  });
+}
+
+/**
+ * 注册下载事件
+ * ---
  */
 document.addEventListener("downloadNovel", async (e) => {
 
@@ -27,77 +96,39 @@ document.addEventListener("downloadNovel", async (e) => {
 
   // 小说
   const novel = {
-    name: "",
+    // 名称
+    name: document.querySelector(selectors.name)?.innerText || "未命名",
+    // 章节列表
     chapters: [],
   }
 
-  // 小说名称
-  novel.name = document.querySelector(selectors.name)?.innerText || "未命名";
-
-  // 章节元素
-  const chapterElms = await (() => {
-    const sections = [...document.querySelectorAll(selectors.chapterSections)];
-    if (!sections.length) {
-      return [...document.querySelectorAll(selectors.chapters)];
-    }
-    return Promise.all(sections.map((elm) => {
-      return fetch(elm.value).then(r => r.text()).then(text => {
-        const dom = new DOMParser().parseFromString(text, "text/html");
-        return [...dom.querySelectorAll(selectors.chapters)];
-      });
-    }));
-  })();
-
   // 章节列表
-  novel.chapters = chapterElms.flat().map(elm => {
-    return {
-      title: elm.text,
-      url: elm.href,
-      raw: "",
-    }
-  });
-
-  console.log(">>>", novel.chapters);
+  const chapters = await getChapters(selectors.chapters, selectors.paging);
 
   // 加载下一章
-  await (async function loadNext(index = 0) {
-    const progress = `[${index + 1}/${novel.chapters.length}]`;
+  await (async function loadNext(url = chapters[0].url) {
     try {
-      const chapter = novel.chapters[index];
-      if (chapter) {
-        const blob = await fetch(chapter.url).then(r => r.blob());
-        chapter.raw = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.addEventListener("load", (e) => resolve(e.target.result));
-          reader.readAsText(blob, document.characterSet);
-        });
+      const chapter = await getChapter(url, selectors.chapterTitle, selectors.chapterContent, selectors.nextChapter);
+      if (chapter.contentElement) {
+        // 清除内容被排除的元素
+        if (selectors.excludeContent) {
+          for (const elm of chapter.contentElement.querySelectorAll(selectors.excludeContent)) elm.remove?.();
+        }
+        novel.chapters.push([chapter.title].concat(chapter.contentElement.innerText.trim().split(/[\s\n]{2,}/)).join(`\n\n  `));
+      } else {
+        novel.chapters.push("章节内容为空");
       }
-      console.log(progress);
+      console.log(`[${chapter.title}]`);
       // 继续下一章
-      const nextIndex = index + 1;
-      nextIndex in novel.chapters && await loadNext(nextIndex);
+      chapter.nextUrl !== location.href && await loadNext(chapter.nextUrl);
     } catch (error) {
-      console.error(progress, "下载失败...");
-      await loadNext(index);
+      console.error("下载失败...");
+      await loadNext(url);
     }
   })();
 
-  // 小说内容
-  const novelContent = novel.chapters.map((chapter) => {
-    const dom = new DOMParser().parseFromString(chapter.raw, "text/html");
-    const contentElm = dom.querySelector(selectors.content);
-    if (contentElm) {
-      // 清除内容被排除的元素
-      if (selectors.excludeContent) {
-        for (const elm of contentElm.querySelectorAll(selectors.excludeContent)) elm.remove?.();
-      }
-      return [chapter.title].concat(contentElm.innerText.trim().split(/[\s\n]{2,}/)).join(`\n\n  `);
-    }
-    return "章节内容为空";
-  }).join("\n\n\n\n");
-
   // 保存小说
-  saveAs(new Blob([novelContent], { type: `text/plain` }), novel.name);
+  saveAs(new Blob([novel.chapters.join("\n\n\n\n")], { type: `text/plain` }), novel.name);
 
 });
 
