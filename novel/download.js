@@ -47,13 +47,17 @@ function getDOM(url) {
  * }>} 通过Promise返回章节列表
  */
 async function getChapters(chapterSelector, pagingSelector) {
-  return (
-    pagingSelector
-      ? (await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
-        return getDOM(elm.value).then((dom) => dom.querySelectorAll(chapterSelector));
-      }))).flat()
-      : [...document.querySelectorAll(selectors.chapters)]
-  ).map(elm => {
+  let chapterElms = [];
+
+  if (pagingSelector) {
+    chapterElms = (await Promise.all([...document.querySelectorAll(pagingSelector)].map((elm) => {
+      return getDOM(elm.value).then((dom) => [...dom.querySelectorAll(chapterSelector)]);
+    }))).flat();
+  } else {
+    chapterElms = [...document.querySelectorAll(selectors.chapters)];
+  }
+
+  chapterElms.map(elm => {
     return {
       title: elm.text,
       url: elm.href
