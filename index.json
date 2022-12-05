@@ -39,7 +39,7 @@
     "name": "MFCOS",
     "description": "",
     "icon": "",
-    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/mfcos/video.css",
+    "url": "https://raw.githubusercontent.com/rulelee/scripts/main/mfcos/style.css",
     "matches": [
       {
         "type": "wildcard",
